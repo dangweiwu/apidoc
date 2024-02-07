@@ -18,19 +18,20 @@ import (
 解析 转换 workdown
 */
 const (
-	TAG                  = "@"
-	SEP                  = "|"
-	TAG_GROUP            = "group"
-	TAG_API              = "api"
-	TAG_PATH             = "path"
-	TAG_METHOD           = "method"
-	TAG_HEADR            = "header"
-	TAG_FORM             = "form"
-	TAG_URL              = "urlparam"
-	TAG_QUERY            = "query"
-	TAG_DOC              = "doc"
-	TAG_RESPONSE         = "response"
-	TAG_RESOINSE_CONTEXT = "repctx"
+	TAG             = "@"
+	SEP             = "|"
+	TAG_GROUP       = "group"
+	TAG_API         = "api"
+	TAG_PATH        = "path"
+	TAG_METHOD      = "method"
+	TAG_HEADR       = "header"
+	TAG_FORM        = "form"
+	TAG_URL         = "urlparam"
+	TAG_QUERY       = "query"
+	TAG_DOC         = "doc"
+	TAG_RESPONSE    = "response"
+	TAG_TABLE_TITLE = "tbtitle"
+	TAG_TABLE_ROW   = "tbrow"
 
 	TYPE_STRING = "string"
 )
@@ -85,7 +86,17 @@ func StdComment(cm string) string {
 	return strings.Trim(cm, TAG)
 }
 
-// 解析所有的文档对象
+/*
+ParseStructDoc
+struct用 '//@doc | struct_name' 注释
+其中struct_name为自定义全局唯一struct名
+
+tag根据长度按照以下规格解析
+len = 6  | type | name | desc | valid | eg | comment  //form中数据用
+len = 4 | desc | valid | eg | comment                 //form中数据用
+len = 3 | desc | eg | comment  //响应中数据用
+len = 1 | desc                 //响应中数据用
+*/
 func (this *ParserCode) ParseStructDoc(filePath string) error {
 	filePath, _ = filepath.Abs(filePath)
 
@@ -156,28 +167,28 @@ func (this *ParserCode) ParseStructDoc(filePath string) error {
 								//基础类型
 								param.Type = t.Name
 								if t.Obj != nil {
-									param.Comment = "参考" + t.Name + "的定义"
+									param.Comment = "参考" + t.Name + "定义"
 								}
 							case *ast.ArrayType:
 								//数组
 								if ident, ok := t.Elt.(*ast.Ident); ok {
 									param.Type = "[]" + ident.Obj.Name
-									param.Comment = "参考" + ident.Obj.Name + "的定义"
+									param.Comment = "参考" + ident.Obj.Name + "定义"
 								} else {
 									param.Type = "[]"
 								}
 							case *ast.InterfaceType:
 								//接口
 								param.Type = "any"
-								param.Comment = "参考any的定义"
+								param.Comment = "参考" + param.Name + "定义"
 							}
 
 							if docs, has := tags.Lookup("doc"); has {
 
-								docList := strings.Split(docs, "|")
+								docList := strings.Split(docs, SEP)
 								switch len(docList) {
 								case 6:
-									// type name desc valid eg comment
+									// type | name | desc | valid | eg | comment
 									if len(ClearString(docList[0])) != 0 {
 										param.Type = ClearString(docList[0])
 									}
@@ -193,7 +204,7 @@ func (this *ParserCode) ParseStructDoc(filePath string) error {
 										param.Comment = ClearString(docList[5])
 									}
 								case 4:
-
+									// desc| valid | eg | comment
 									param.Desc = ClearString(docList[0])
 									param.Valid = ClearString(docList[1])
 									param.Example = ClearString(docList[2])
@@ -202,14 +213,20 @@ func (this *ParserCode) ParseStructDoc(filePath string) error {
 									}
 									//param.Valid
 								case 3:
+
+									// desc| eg | comment
 									param.Desc = ClearString(docList[0])
 									param.Example = ClearString(docList[1])
 									if len(ClearString(docList[2])) != 0 {
 										param.Comment = ClearString(docList[2])
 									}
+								case 1:
+									//desc
+									param.Desc = ClearString(docList[0])
 								}
 
 								this.StructDoc[tagname].Params = append(this.StructDoc[tagname].Params, param)
+
 								if strings.HasPrefix(param.Type, "int") {
 									this.StructDoc[tagname].JsonData[param.Name], _ = strconv.Atoi(param.Example)
 									if len(param.Example) == 0 {
@@ -292,9 +309,6 @@ func (this *ParserCode) ParseFuncComment(coms []*ast.Comment) {
 }
 
 // 组数据处理
-/**
-eg:// @group groupname ordernum 标题工作 组描述
-*/
 
 func ClearString(s string) string {
 	s = strings.TrimPrefix(s, "\"")
@@ -307,6 +321,12 @@ func ClearString(s string) string {
 	return s
 
 }
+
+/*
+groupHandler
+按照一下规则解析
+eg:// @group | groupname | ordernum | 标题工作 | 组描述
+*/
 func (this *ParserCode) groupHandler(data []string) {
 	if len(data) < 2 {
 		return
@@ -329,6 +349,20 @@ func (this *ParserCode) groupHandler(data []string) {
 	this.ApiGroup[o.Name] = o
 }
 
+/*
+apiHandler
+函数注释解析 针对一个func的doc
+// @api | group-name | name | order-num    //组名|接口名|排序
+// @path     | /api/data:id                // api路径
+// @method   |  POST                       //api method
+// @header 	 | name | desc | eg | comment  //header   | 变量标识 | 变量名 | 示例 | 注释
+// @urlparam | name | desc | eg | comment  //路径参数
+// @query    | name | desc | eg | comment  //query
+// @form     | struct_name | desc | comment //表单  |结构体标识 | 名 | 注释
+// @response | struct_name | desc | comment //response
+// @tbtitle | desc | comment               //自定义响应头  | 描述 | 备注
+// @tbrow   | name | desc | eg | comment
+*/
 // 解析api 针对一个func的doc
 func (this *ParserCode) apiHandler(coms []*ast.Comment) {
 
@@ -436,35 +470,30 @@ func (this *ParserCode) apiHandler(coms []*ast.Comment) {
 			apiobj.ParamsUrl.Params = append(apiobj.ParamsUrl.Params, param)
 			apiobj.ParamsUrl.JsonData[param.Name] = param.Example
 		case TAG_QUERY:
-			// type | name | desc | valid | eg | comment
-
+			//  name | desc | eg | comment
 			if apiobj.ParamsQuery == nil {
 				obj := new(BaseData)
 				obj.Type = TAG_QUERY
 				obj.Title = "QUERY 参数"
 				obj.JsonData = map[string]interface{}{}
 				apiobj.ParamsQuery = obj
+
 			}
 			param := new(Param)
 			param.Type = TYPE_STRING
 			for k, v := range docList {
 				v := ClearString(v)
 				if k == 1 {
-					param.Type = v
-				} else if k == 2 {
 					param.Name = v
-				} else if k == 3 {
+				} else if k == 2 {
 					param.Desc = v
-				} else if k == 4 {
-					param.Valid = v
-				} else if k == 5 {
+				} else if k == 3 {
 					param.Example = v
-				} else if k == 6 {
+				} else if k == 4 {
 					param.Comment = v
 				}
 			}
 			apiobj.ParamsQuery.Params = append(apiobj.ParamsQuery.Params, param)
-			apiobj.ParamsUrl.JsonData[param.Name] = param.Example
 
 		case TAG_FORM:
 			// struct | title | comment
@@ -553,12 +582,8 @@ func (this *ParserCode) apiHandler(coms []*ast.Comment) {
 			}
 
 			if len(structName) == 0 {
-				continue
-			}
-
-			if structName == "BASE" {
-				obj.Type = TAG_RESOINSE_CONTEXT
-				continue
+				fmt.Printf("[err] need struct name\n")
+				os.Exit(1)
 			}
 
 			structObj, has := this.StructDoc[structName]
@@ -579,9 +604,39 @@ func (this *ParserCode) apiHandler(coms []*ast.Comment) {
 				param.Comment = v.Comment
 				obj.Params = append(obj.Params, param)
 			}
+		case TAG_TABLE_TITLE:
+			//  title | comment
+			if len(apiobj.ParamsResponse) == 0 {
+				apiobj.ParamsResponse = []*BaseData{}
+			}
 
-		case TAG_RESOINSE_CONTEXT:
-			// name | eg | comment
+			obj := new(BaseData)
+			obj.Type = TAG_TABLE_TITLE
+			obj.Title = "RESPONSE 数据结构"
+			obj.JsonData = map[string]interface{}{}
+			obj.Params = []*Param{}
+			apiobj.ParamsResponse = append(apiobj.ParamsResponse, obj)
+
+			structTitle := ""
+			structComment := ""
+			for k, v := range docList {
+				switch k {
+				case 1:
+					structTitle = v
+				case 2:
+					structComment = v
+				}
+			}
+
+			if len(structTitle) != 0 {
+				obj.Title = structTitle
+			}
+			if len(structComment) != 0 {
+				obj.Desc = structComment
+			}
+
+		case TAG_TABLE_ROW:
+			// name | desc | eg | comment
 			param := new(Param)
 			for k, v := range docList {
 				switch k {
@@ -590,6 +645,8 @@ func (this *ParserCode) apiHandler(coms []*ast.Comment) {
 				case 2:
 					param.Desc = v
 				case 3:
+					param.Example = v
+				case 4:
 					param.Comment = v
 				}
 			}
