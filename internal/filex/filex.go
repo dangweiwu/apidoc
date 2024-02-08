@@ -1,6 +1,7 @@
 package filex
 
 import (
+	"apidoc/internal/parse"
 	"bufio"
 	"errors"
 	"fmt"
@@ -13,6 +14,14 @@ import (
 type Filex struct {
 	Root   string
 	Module string
+	Parse  *parse.ParserCode
+}
+
+func NewFilex(root string) *Filex {
+	return &Filex{
+		Root:  root,
+		Parse: parse.NewParserCode(),
+	}
 }
 
 func (this *Filex) GetModule() error {
@@ -38,18 +47,42 @@ func (this *Filex) GetModule() error {
 
 }
 
-func (this *Filex) visitFile(fp string, fi os.FileInfo, err error) error {
+func (this *Filex) visitStruct(fp string, fi os.FileInfo, err error) error {
 	if err != nil {
-		fmt.Println(err)
+		//fmt.Println(err)
 		return nil
 	}
 	if fi.IsDir() {
-		fmt.Printf("[dir] %s %s\n", fp, fi.Name())
+		//fmt.Printf("[dir] %s %s\n", fp, fi.Name())
 		return nil
 	}
-	fmt.Printf("[FILE]: %s %s \n", fp, fi.Name())
+
+	if strings.HasSuffix(fi.Name(), ".go") {
+		this.Parse.ParseStructDoc(fp)
+	}
+	//fmt.Printf("[FILE]: %s %s \n", fp, fi.Name())
 	return nil
 }
+
+func (this *Filex) visitFunc(fp string, fi os.FileInfo, err error) error {
+	if err != nil {
+		//fmt.Println(err)
+		return nil
+	}
+	if fi.IsDir() {
+		//fmt.Printf("[dir] %s %s\n", fp, fi.Name())
+		return nil
+	}
+
+	if strings.HasSuffix(fi.Name(), ".go") {
+		this.Parse.ParseFuncDoc(fp)
+	}
+	//fmt.Printf("[FILE]: %s %s \n", fp, fi.Name())
+	return nil
+}
+
 func (this *Filex) Walk() {
-	filepath.Walk(this.Root, this.visitFile)
+	filepath.Walk(this.Root, this.visitStruct)
+	filepath.Walk(this.Root, this.visitFunc)
+
 }

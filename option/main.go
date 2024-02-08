@@ -18,7 +18,9 @@ type Root struct {
 
 func (this *Root) Usage() string {
 	return `
-	api workdown文档生成`
+api workdown文档生成
+默认根目录当前文件夹
+`
 }
 func (this *Root) Execute(args []string) error {
 	var (
@@ -33,7 +35,8 @@ func (this *Root) Execute(args []string) error {
 	}
 	fmt.Printf("[根目录] %s\n", root)
 
-	fobj := &filex.Filex{Root: root}
+	fobj := filex.NewFilex(root)
+	//fobj := &filex.Filex{Root: root}
 	err = fobj.GetModule()
 	if err != nil {
 		fmt.Printf("[ERR]: %s\n", err)

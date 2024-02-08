@@ -1,8 +1,14 @@
 package parse
 
 import (
+	_ "embed"
 	"os"
 	"text/template"
+)
+
+var (
+	//go:embed mdtpl.tpl
+	md_tpl string
 )
 
 // markdown 格式输出

@@ -1,113 +1,128 @@
-package parse
-
-var (
-	md_tpl = `---
+---
 theme: orange
 ---
-
+```run
+window.SetConfig(
+    "http://",
+    {"Authorization":""}
+)
+```
 # {{.Title}}
 
 版本{{.Version}}
 
-{{.Description}}
+{{- .Description}}
 
-[//]:(apigroup)
-{{range $index,$group := .ApiGroup}}
+{{- range $index,$group := .ApiGroup}}
 ## {{$group.Title}}
 
 {{$group.Desc}}
 
-[//]:(apiinfo循环)
-{{range $k,$api := $group.ApiInfo}}
-	
+{{- range $k,$api := $group.ApiInfo}}
+
 ### {{$api.Title}}
-	
+
 > 基础信息
-	
+
 - **PATH: {{$api.Path -}}**
 - **METHOD: {{$api.Method -}}**
 
-[//]:(url)
-{{if $api.ParamsUrl}}
-> {{if $api.ParamsUrl.Title}} {{$api.ParamsUrl.Title}} {{else}} Url 参数{{end}}
+{{- if $api.ParamsUrl}}
+> {{- if $api.ParamsUrl.Title}} {{$api.ParamsUrl.Title}} {{else}} Url 参数{{end}}
 
-{{$api.ParamsUrl.Desc}}
+{{- $api.ParamsUrl.Desc}}
 
-[//]:(url_params)
-{{if $api.ParamsUrl.Params}}
+{{- if $api.ParamsUrl.Params}}
+
 | 参数 | 说明 | 示例 | 备注 |
 | --- | --- | -- | -- |
 {{- range $k,$tb := $api.ParamsUrl.Params}}
 |{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Example}}|{{$tb.Comment}}|
 {{- end}}
 
-{{end}}
-[//]:(url_params_end)
-{{end}}
-[//]:(url_end)
+{{- end}}
 
-[//]:(header)
-{{if $api.ParamsHeader}}
+{{- end}}
+
+{{- if $api.ParamsHeader}}
 > {{if $api.ParamsHeader.Title}} {{$api.ParamsHeader.Title}} {{else}} Header 参数{{end}}
 
 {{$api.ParamsHeader.Desc}}
 
-[//]:(header.params)
-{{if $api.ParamsHeader.Params}}
+{{- if $api.ParamsHeader.Params}}
+
 | 参数 | 说明 | 示例 | 备注 |
 | --- | --- | -- | -- |
 {{- range $k,$tb := $api.ParamsHeader.Params}}
 |{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Example}}|{{$tb.Comment}}|
-{{- end}}[//]:(header.params.table)
+{{- end}}
 
-{{end}}[//]:(header.params_end)
+{{- end}}
 
-{{end}}[//]:(header_end)
+{{- end}}
 
-
-[//]:(query)
-{{if $api.ParamsQuery}}
+{{- if $api.ParamsQuery}}
 > {{if $api.ParamsQuery.Title}} {{$api.ParamsQuery.Title}} {{else}} Query 参数{{end}}
 
 {{$api.ParamsQuery.Desc}}
-{{if $api.ParamsQuery.Params}}
+{{- if $api.ParamsQuery.Params}}
+
 | 参数 | 说明 | 示例 | 备注 |
 | --- | --- | -- | -- |
 {{- range $k,$tb := $api.ParamsQuery.Params}}
 |{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Example}}|{{$tb.Comment}}|
 {{- end}}
 
-{{end}}
+{{- end}}
 
-{{end}}
-[//]:(query_end)
+{{- end}}
 
-
-[//]:(form)
-{{if $api.ParamsForm}}
+{{- if $api.ParamsForm}}
 > {{if $api.ParamsForm.Title}} {{$api.ParamsForm.Title}} {{else}} Form 参数{{end}}
 
-{{$api.ParamsForm.Desc}}
+{{- $api.ParamsForm.Desc}}
 
-{{if $api.ParamsForm.Params}}
+{{- if $api.ParamsForm.Params}}
+
 | 参数 | 说明 | 类型 | 校验 | 示例 | 备注 |
 | --- | --- | -- | -- | -- |  --  |
 {{- range $k,$tb := $api.ParamsForm.Params}}
 |{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Type}}|{{$tb.Valid}}|{{$tb.Example}}|{{$tb.Comment}}|
 {{- end}}
 
-{{end}}
+{{- end}}
 
-{{end}}
-[//]:(form_end)
+{{- end}}
 
+```button
+var req = {
 
-[//]:(response)
-{{range $api.ParamsResponse}}
+    Url:"{{- $api.Path -}}",
+    Method:"{{- $api.Method -}}",
+    {{- if $api.ParamsForm }}
+    Form:{
+        {{- range $k,$tb := $api.ParamsForm.Params }}
+        {{$tb.Name}}:{{if eq $tb.Type "string"}}"{{- $tb.Example -}}"{{else}}{{$tb.Example}}}{{end}},
+        {{- end}}
+    },
+    {{- end}}
+    Header:{},
+    {{- if $api.ParamsQuery }}
+    Query:{
+        {{- range $k,$tb := $api.ParamsQuery.Params }}
+        {{$tb.Name}}:"{{- $tb.Example -}}",
+        {{- end}}
+    },
+    {{- end}}
+}
+window.Fetch(req);
+```
+
+{{- range $api.ParamsResponse}}
 
 > {{if .Title}} {{.Title}} {{else}} Response 数据{{end}}
 
-{{.Desc}}
+{{- .Desc}}
 
 	{{- if .Params}}
 
@@ -120,6 +135,7 @@ theme: orange
 {{- end}}
 
 {{else}}
+
 | 参数 | 说明 | 类型 | 示例 | 备注 |
 | --- | --- | -- | -- | -- |
 {{- range $k,$tb := .Params}}
@@ -127,12 +143,9 @@ theme: orange
 {{- end}}
 		{{- end}}
 	{{- end}}
-{{end}}
-[//]:(response_end)
+{{- end}}
 
 ---
-{{end}}[//]:(apiinfo_end)
+{{- end}}
 
-{{end}}[//]:(apigroup_end)
-`
-)
+{{- end}}

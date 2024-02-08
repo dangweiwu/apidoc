@@ -142,6 +142,7 @@ func (this *ParserCode) ParseStructDoc(filePath string) error {
 				fmt.Printf("[ERR]: struct name %s is exists \n", tagname)
 				os.Exit(1)
 			} else {
+				fmt.Printf("[info]: struct %s \n", tagname)
 				this.StructDoc[tagname] = new(BaseData)
 				this.StructDoc[tagname].Params = []*Param{}
 				this.StructDoc[tagname].JsonData = map[string]interface{}{}
@@ -337,6 +338,7 @@ func (this *ParserCode) groupHandler(data []string) {
 	}
 	o := &ApiGroup{}
 	o.Name = ClearString(data[1])
+
 	for k, v := range data {
 		if k == 2 {
 			if ord, err := strconv.Atoi(ClearString(v)); err == nil {
@@ -346,6 +348,7 @@ func (this *ParserCode) groupHandler(data []string) {
 			}
 		} else if k == 3 {
 			o.Title = ClearString(v)
+			fmt.Printf("[info]: route %s \n", o.Title)
 		} else if k == 4 {
 			o.Desc = ClearString(v)
 		}
@@ -374,6 +377,7 @@ func (this *ParserCode) apiHandler(coms []*ast.Comment) {
 		tagname string
 		apiobj  = new(ApiInfo)
 	)
+
 	for _, com := range coms {
 		doc := StdComment(com.Text)
 		if len(doc) == 0 {
@@ -405,6 +409,7 @@ func (this *ParserCode) apiHandler(coms []*ast.Comment) {
 
 				} else if k == 2 {
 					apiobj.Title = ClearString(v)
+					fmt.Printf("[info]: func %s \n", apiobj.Title)
 					if len(apiobj.Title) == 0 {
 						apiobj.Title = "API"
 					}
@@ -685,6 +690,7 @@ func (this *ParserCode) baseHanler(coms []*ast.Comment) {
 		switch tagname {
 		case TAG_BASE:
 			for k, v := range docList {
+				fmt.Printf("[info]: base %s \n", v)
 				switch k {
 				case 1:
 					this.Doc.Title = v
@@ -694,6 +700,7 @@ func (this *ParserCode) baseHanler(coms []*ast.Comment) {
 			}
 		case TAG_DESC:
 			for k, v := range docList {
+				fmt.Printf("[info]: base %s \n", v)
 				switch k {
 				case 1:
 					this.Doc.Description = v
