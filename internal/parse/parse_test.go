@@ -1,7 +1,10 @@
 package parse
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"math/rand"
+	"strconv"
 	"testing"
 )
 
@@ -9,7 +12,7 @@ func TestParserFuncGroup(t *testing.T) {
 	ps := NewParserCode()
 	ps.ParseFuncDoc("./example/baseapi.go")
 
-	apigroup := ps.ApiGroup["groupname"]
+	apigroup := ps.ApiGroup[0]
 	if !assert.NotNil(t, apigroup) {
 		return
 	}
@@ -223,4 +226,56 @@ func TestParserQuery(t *testing.T) {
 	assert.Equal(t, "姓名", param.Desc)
 	assert.Equal(t, "name", param.Name)
 
+}
+
+func TestParserCode_SortData(t *testing.T) {
+
+	parsedata := NewParserCode()
+
+	parsedata.ApiGroup = make([]*ApiGroup, 10, 10)
+
+	for i := 0; i < 10; i++ {
+		parsedata.ApiGroup[i] = &ApiGroup{Name: strconv.Itoa(i), OrderNum: rand.Intn(1000)}
+		apiinfo := make([]*ApiInfo, 10, 10)
+
+		for j := 0; j < 10; j++ {
+			apiinfo[j] = &ApiInfo{OrderNum: rand.Intn(1000)}
+			parsedata.ApiInfo[parsedata.ApiGroup[i].Name] = apiinfo
+		}
+	}
+
+	parsedata.SortData()
+	grouptmp := 0
+	apitmp := 0
+	for kk, v := range parsedata.ApiGroup {
+		assert.Equal(t, true, v.OrderNum >= grouptmp, "grouperr %d %d %d", kk, v.OrderNum, grouptmp)
+		grouptmp = v.OrderNum
+		apitmp = 0
+		for k, api := range v.ApiInfo {
+			assert.Equal(t, true, api.OrderNum >= apitmp, "apierr index:%d %d %d", k, api.OrderNum, apitmp)
+			apitmp = api.OrderNum
+		}
+	}
+}
+
+func TestNewMdOut(t *testing.T) {
+
+	parsedata := NewParserCode()
+
+	parsedata.ParseStructDoc("./example/sub/base.go")
+	parsedata.ParseStructDoc("./example/sub/create.go")
+	parsedata.ParseStructDoc("./example/sub/query.go")
+	parsedata.ParseStructDoc("./example/sub/update.go")
+
+	parsedata.ParseFuncDoc("./example/baseapi.go")
+	parsedata.ParseFuncDoc("./example/create.go")
+	parsedata.ParseFuncDoc("./example/query.go")
+	parsedata.ParseFuncDoc("./example/update.go")
+
+	parsedata.SortData()
+
+	md := NewMdOut(parsedata.Doc, "api2.md")
+
+	err := md.Out()
+	fmt.Println(err)
 }

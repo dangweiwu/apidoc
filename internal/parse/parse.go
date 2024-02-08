@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -20,6 +21,8 @@ import (
 const (
 	TAG             = "@"
 	SEP             = "|"
+	TAG_BASE        = "base"
+	TAG_DESC        = "desc"
 	TAG_GROUP       = "group"
 	TAG_API         = "api"
 	TAG_PATH        = "path"
@@ -38,14 +41,14 @@ const (
 
 type ParserCode struct {
 	Doc       *DocData
-	ApiGroup  map[string]*ApiGroup
+	ApiGroup  []*ApiGroup
 	ApiInfo   map[string][]*ApiInfo
 	StructDoc map[string]*BaseData
 }
 
 func NewParserCode() *ParserCode {
 	return &ParserCode{
-		&DocData{}, map[string]*ApiGroup{}, map[string][]*ApiInfo{}, map[string]*BaseData{},
+		&DocData{}, []*ApiGroup{}, map[string][]*ApiInfo{}, map[string]*BaseData{},
 	}
 }
 
@@ -303,7 +306,8 @@ func (this *ParserCode) ParseFuncComment(coms []*ast.Comment) {
 		this.groupHandler(commentList)
 	case TAG_API:
 		this.apiHandler(coms)
-
+	case TAG_BASE:
+		this.baseHanler(coms)
 	}
 
 }
@@ -346,7 +350,7 @@ func (this *ParserCode) groupHandler(data []string) {
 			o.Desc = ClearString(v)
 		}
 	}
-	this.ApiGroup[o.Name] = o
+	this.ApiGroup = append(this.ApiGroup, o)
 }
 
 /*
@@ -655,3 +659,61 @@ func (this *ParserCode) apiHandler(coms []*ast.Comment) {
 
 	}
 }
+
+func (this *ParserCode) baseHanler(coms []*ast.Comment) {
+	var (
+		tagname string
+	)
+	for _, com := range coms {
+		doc := StdComment(com.Text)
+		if len(doc) == 0 {
+			continue
+		}
+
+		docList := strings.Split(doc, SEP)
+
+		for i, v := range docList {
+			docList[i] = ClearString(v)
+		}
+
+		if len(docList) >= 1 {
+			tagname = docList[0]
+		} else {
+			continue
+		}
+
+		switch tagname {
+		case TAG_BASE:
+			for k, v := range docList {
+				switch k {
+				case 1:
+					this.Doc.Title = v
+				case 2:
+					this.Doc.Version = v
+				}
+			}
+		case TAG_DESC:
+			for k, v := range docList {
+				switch k {
+				case 1:
+					this.Doc.Description = v
+				}
+			}
+		}
+	}
+}
+
+// 排序组织数据
+func (this *ParserCode) SortData() {
+	for k, v := range this.ApiGroup {
+		//排序api 并赋值给apigroup
+		apis := this.ApiInfo[v.Name]
+		sort.Sort(SortApiList(apis))
+		this.ApiGroup[k].ApiInfo = apis
+	}
+	//排序apigroup并复制给doc
+	sort.Sort(SortGroupList(this.ApiGroup))
+	this.Doc.ApiGroup = this.ApiGroup
+}
+
+//格式输出
