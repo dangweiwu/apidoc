@@ -206,6 +206,11 @@ func (this *ParserCode) ParseStructDoc(filePath string) error {
 								param.Name = name
 							}
 
+							//校验
+							if binding, has := tags.Lookup("binding"); has {
+								param.Valid = binding
+							}
+
 							//类型
 							switch t := v.Type.(type) {
 							case *ast.Ident:
