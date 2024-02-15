@@ -43,7 +43,7 @@ func TestParserCreate(t *testing.T) {
 
 	ps.ParseFuncDoc("./example/create.go")
 
-	_apiinfo := ps.ApiInfo["demo1"]
+	_apiinfo := ps.ApiInfo["groupname"]
 	if !assert.NotNil(t, _apiinfo) {
 		return
 	}
@@ -110,7 +110,7 @@ func TestParserUpdate(t *testing.T) {
 
 	ps.ParseFuncDoc("./example/update.go")
 
-	_apiinfo := ps.ApiInfo["demo1"]
+	_apiinfo := ps.ApiInfo["groupname"]
 	if !assert.NotNil(t, _apiinfo) {
 		return
 	}
@@ -129,7 +129,7 @@ func TestParserUpdate(t *testing.T) {
 
 	assert.Equal(t, TAG_URL, data.Type)
 	assert.Equal(t, "id", data.Params[0].Name)
-	assert.Equal(t, "string", data.Params[0].Type)
+	assert.Equal(t, "int", data.Params[0].Type)
 	assert.Equal(t, "用户ID", data.Params[0].Desc)
 	assert.Equal(t, "", data.Params[0].Valid)
 	assert.Equal(t, "1", data.Params[0].Example)
@@ -154,7 +154,7 @@ func TestParserQuery(t *testing.T) {
 
 	ps.ParseFuncDoc("./example/query.go")
 
-	apiinfos := ps.ApiInfo["group1"]
+	apiinfos := ps.ApiInfo["groupname"]
 	//
 	if !assert.NotEqual(t, 0, len(apiinfos)) {
 		return
@@ -163,7 +163,7 @@ func TestParserQuery(t *testing.T) {
 	apiinfo := apiinfos[0]
 
 	assert.Equal(t, "请求参数", apiinfo.Title)
-	assert.Equal(t, "group1", apiinfo.GroupName)
+	assert.Equal(t, "groupname", apiinfo.GroupName)
 	assert.Equal(t, "/api/data", apiinfo.Path)
 	assert.Equal(t, "GET", apiinfo.Method)
 	assert.Equal(t, 3, apiinfo.OrderNum)
@@ -278,4 +278,18 @@ func TestNewMdOut(t *testing.T) {
 
 	err := md.Out()
 	fmt.Println(err)
+}
+
+func TestParseBase(t *testing.T) {
+	s := "@type |s struct_name |n name |d desc |e example |v valid |c comment |t type"
+	p := ParseBase(s)
+
+	assert.Equal(t, p.StructName, "struct_name")
+	assert.Equal(t, p.Name, "name")
+	assert.Equal(t, p.Desc, "desc")
+	assert.Equal(t, p.Example, "example")
+	assert.Equal(t, p.Valid, "valid")
+	assert.Equal(t, p.Comment, "comment")
+	assert.Equal(t, p.Type, "type")
+
 }

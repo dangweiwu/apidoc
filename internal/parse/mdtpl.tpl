@@ -51,10 +51,10 @@ window.SetConfig(
 
 {{- if $api.ParamsHeader.Params}}
 
-| 参数 | 说明 | 示例 | 备注 |
-| --- | --- | -- | -- |
+| 参数 | 说明| 类型 | 示例 | 备注 |
+| --- | --- | --- | --- | --- |
 {{- range $k,$tb := $api.ParamsHeader.Params}}
-|{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Example}}|{{$tb.Comment}}|
+|{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Type}}|{{$tb.Example}}|{{$tb.Comment}}|
 {{- end}}
 
 {{- end}}
@@ -67,10 +67,10 @@ window.SetConfig(
 {{$api.ParamsQuery.Desc}}
 {{- if $api.ParamsQuery.Params}}
 
-| 参数 | 说明 | 示例 | 备注 |
-| --- | --- | -- | -- |
+| 参数 | 说明 |类型| 示例 | 备注 |
+| --- | --- | -- | -- | -- |
 {{- range $k,$tb := $api.ParamsQuery.Params}}
-|{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Example}}|{{$tb.Comment}}|
+|{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Type}}|{{$tb.Example}}|{{$tb.Comment}}|
 {{- end}}
 
 {{- end}}
@@ -128,10 +128,10 @@ window.Fetch(req);
 
 		{{- if eq .Type "tbtitle"}}
 
-| 参数 | 说明 | 示例 | 备注 |
-| --- | --- | -- | -- |
+| 参数 | 说明 |类型| 示例 | 备注 |
+| --- | --- | -- |-- | -- |
 {{- range $k,$tb := .Params}}
-|{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Example}}|{{$tb.Comment}}|
+|{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Type}}|{{$tb.Example}}|{{$tb.Comment}}|
 {{- end}}
 
 {{else}}

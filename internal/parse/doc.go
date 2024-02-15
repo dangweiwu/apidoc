@@ -44,7 +44,6 @@ type ApiInfo struct {
 	ParamsQuery    *BaseData
 	ParamsForm     *BaseData
 	ParamsResponse []*BaseData
-	JsCode         string //js代码 mock用
 }
 
 type SortApiList []*ApiInfo
@@ -63,20 +62,20 @@ func (this SortApiList) Swap(i, j int) {
 
 // 要给结构体映射一个
 type BaseData struct {
-	Type     string //类型行 header form response
-	Kind     string // struct 类型名
-	Title    string //标题
-	Desc     string //描述
-	Params   []*Param
-	JsonData map[string]interface{}
+	Type   string //类型行 header form response
+	Kind   string // struct 类型名
+	Title  string //标题
+	Desc   string //描述
+	Params []*Param
 }
 
 // tag 解析
 type Param struct {
-	Type    string // 类型
-	Name    string //名称符号
-	Desc    string //说明描述
-	Valid   string //校验
-	Example string //示例
-	Comment string //备注
+	StructName string //类型名
+	Type       string // 类型
+	Name       string //名称符号
+	Desc       string //说明描述
+	Valid      string //校验
+	Example    string //示例
+	Comment    string //备注
 }
