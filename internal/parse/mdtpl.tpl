@@ -9,9 +9,9 @@ window.SetConfig(
 ```
 # {{.Title}}
 
-版本{{.Version}}
+- 版本{{.Version}}
 
-{{- .Description}}
+- {{.Description}}
 
 {{- range $index,$group := .ApiGroup}}
 ## {{$group.Title}}
@@ -100,13 +100,13 @@ var req = {
     Url:"{{- $api.Path -}}",
     Method:"{{- $api.Method -}}",
     {{- if $api.ParamsForm }}
+    Header:{"Authorization":""},
     Form:{
         {{- range $k,$tb := $api.ParamsForm.Params }}
         {{$tb.Name}}:{{if eq $tb.Type "string"}}"{{- $tb.Example -}}"{{else}}{{$tb.Example}}}{{end}},
         {{- end}}
     },
     {{- end}}
-    Header:{},
     {{- if $api.ParamsQuery }}
     Query:{
         {{- range $k,$tb := $api.ParamsQuery.Params }}

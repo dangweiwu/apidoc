@@ -84,5 +84,5 @@ func (this *Filex) visitFunc(fp string, fi os.FileInfo, err error) error {
 func (this *Filex) Walk() {
 	filepath.Walk(this.Root, this.visitStruct)
 	filepath.Walk(this.Root, this.visitFunc)
-
+	this.Parse.SortData()
 }

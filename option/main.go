@@ -2,8 +2,10 @@ package option
 
 import (
 	"apidoc/internal/filex"
+	"apidoc/internal/parse"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 var Opt Option
@@ -14,6 +16,7 @@ type Option struct {
 
 type Root struct {
 	Root string `short:"r" description:"根路径"`
+	Name string `short:"o" description:"输出文件名"`
 }
 
 func (this *Root) Usage() string {
@@ -46,6 +49,16 @@ func (this *Root) Execute(args []string) error {
 	fmt.Printf("[MODULE]: %s\n", fobj.Module)
 
 	fobj.Walk()
+	if len(this.Name) == 0 {
+		os.MkdirAll(filepath.Join(this.Root, "doc"), 0777)
+		this.Name = filepath.Join(this.Root, "doc", "api.md")
+	}
+
+	if err := parse.NewMdOut(fobj.Parse.Doc, this.Name).Out(); err == nil {
+		fmt.Printf("[ok]: 生成文件:%s \n", this.Name)
+	} else {
+		fmt.Printf("[err]: 生成失败 :%v\n", err)
+	}
 
 	return nil
 }

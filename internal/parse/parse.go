@@ -150,13 +150,15 @@ func (this *ParserCode) ParseStructDoc(filePath string) error {
 		return fmt.Errorf("ast对象创建失败:%w", err)
 	}
 
-	//ast.Print(fset, f)
+	//ast.Print(fset, f) /
 
 	comNodes := ast.NewCommentMap(fset, f, f.Comments)
 	for node := range comNodes {
 		tagname := ""
 		if n, ok := node.(*ast.GenDecl); ok {
-
+			if n.Doc == nil {
+				continue
+			}
 			for _, v := range n.Doc.List {
 				tag := StdComment(v.Text)
 				if len(tag) == 0 {
@@ -199,7 +201,9 @@ func (this *ParserCode) ParseStructDoc(filePath string) error {
 						for _, v := range structObj.Fields.List {
 							//类型名称
 							param := new(Param)
-
+							if v.Tag == nil {
+								continue
+							}
 							//名称
 							tags := reflect.StructTag(ClearString(v.Tag.Value))
 							if name, has := tags.Lookup("json"); has {
@@ -242,8 +246,11 @@ func (this *ParserCode) ParseStructDoc(filePath string) error {
 								if len(tagdoc.Name) != 0 {
 									param.Name = tagdoc.Name
 								}
+
+								if len(tagdoc.Valid) != 0 {
+									param.Valid = tagdoc.Valid
+								}
 								param.Desc = tagdoc.Desc
-								param.Valid = tagdoc.Valid
 								param.Example = tagdoc.Example
 								param.Comment = tagdoc.Comment
 
