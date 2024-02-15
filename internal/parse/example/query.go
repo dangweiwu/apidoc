@@ -1,7 +1,7 @@
 package example
 
 // Query
-// @api | groupname | 请求参数 | 3
+// @api | groupname | 3 | 请求参数
 // @path     | /api/data
 // @method   | GET
 // @header 	 |n Authorization |d token |e tokenstring |c 鉴权 |t string

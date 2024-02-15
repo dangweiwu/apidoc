@@ -1,7 +1,7 @@
 package example
 
 // Update
-// @api | groupname | 更新数据 | 2
+// @api | groupname | 2 | 更新数据
 // @path     | /api/data:id
 // @method   |  PUT
 // @urlparam |n id 			  |d 用户ID  |e 1                  |t int

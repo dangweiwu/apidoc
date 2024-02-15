@@ -1,7 +1,7 @@
 package example
 
 // Create
-// @api | groupname | 创建数据 | 1
+// @api | groupname | 1 | 创建数据
 // @path     | /api/data
 // @method   |  POST
 // @header 	 |n Authorization |d token |t string |e tokenstring |c 鉴权
