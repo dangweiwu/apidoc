@@ -34,10 +34,10 @@ window.SetConfig(
 
 {{- if $api.ParamsUrl.Params}}
 
-| 参数 | 说明 | 示例 | 备注 |
-| --- | --- | -- | -- |
+| 参数 | 说明 | 类型 | 示例 | 备注 |
+| --- | --- | -- | -- | -- |
 {{- range $k,$tb := $api.ParamsUrl.Params}}
-|{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Example}}|{{$tb.Comment}}|
+|{{$tb.Name}}|{{$tb.Desc}}|{{$tb.Type}}|{{$tb.Example}}|{{$tb.Comment}}|
 {{- end}}
 
 {{- end}}
