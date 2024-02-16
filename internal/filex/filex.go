@@ -1,10 +1,10 @@
 package filex
 
 import (
-	"apidoc/internal/parse"
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/dangweiwu/apidoc/internal/parse"
 	"os"
 	"path"
 	"path/filepath"

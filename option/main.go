@@ -1,9 +1,9 @@
 package option
 
 import (
-	"apidoc/internal/filex"
-	"apidoc/internal/parse"
 	"fmt"
+	"github.com/dangweiwu/apidoc/internal/filex"
+	"github.com/dangweiwu/apidoc/internal/parse"
 	"os"
 	"path/filepath"
 )

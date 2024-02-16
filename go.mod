@@ -1,4 +1,4 @@
-module apidoc
+module  github.com/dangweiwu/apidoc
 
 go 1.21.4
 

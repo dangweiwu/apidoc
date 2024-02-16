@@ -1,7 +1,7 @@
 package main
 
 import (
-	"apidoc/option"
+	"github.com/dangweiwu/apidoc/option"
 	"github.com/jessevdk/go-flags"
 	_ "github.com/jessevdk/go-flags"
 )
