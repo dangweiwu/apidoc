@@ -22,6 +22,10 @@ window.SetConfig(
 
 ### {{$api.Title}}
 
+{{- if $api.Desc}}
+{{$api.Desc}}
+{{- end}}
+
 > 基础信息
 
 - **PATH: {{$api.Path -}}**

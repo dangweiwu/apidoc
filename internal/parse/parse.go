@@ -345,7 +345,7 @@ func (this *ParserCode) groupHandler(data []string) {
 /*
 apiHandler
 函数注释解析 针对一个func的doc
-// @api | group-name |  order-num | name    //组名|接口名|排序
+// @api | group-name |  order-num | name  | desc  //组名|接口名|排序
 // @path     | /api/data:id                // api路径
 // @method   |  POST                       //api method
 // @header 	 ParseBase  //header   | 变量标识 | 变量名 | 示例 | 注释
@@ -401,6 +401,8 @@ func (this *ParserCode) apiHandler(coms []*ast.Comment) {
 					}
 				} else if k == 2 {
 					apiobj.OrderNum, _ = strconv.Atoi(ClearString(v))
+				} else if k == 4 {
+					apiobj.Desc = ClearString(v)
 				}
 			}
 		case TAG_PATH:

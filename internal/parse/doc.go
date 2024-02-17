@@ -36,6 +36,7 @@ type ApiInfo struct {
 	Title     string //接口名称
 	GroupName string
 	OrderNum  int
+	Desc      string //描述
 
 	Path           string
 	Method         string
