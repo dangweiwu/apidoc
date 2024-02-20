@@ -108,7 +108,7 @@ var req = {
     Header:{"Authorization":""},
     Form:{
         {{- range $k,$tb := $api.ParamsForm.Params }}
-        {{$tb.Name}}:{{if eq $tb.Type "string"}}"{{- $tb.Example -}}"{{else}}{{$tb.Example}}}{{end}},
+        {{$tb.Name}}:{{if eq $tb.Type "string"}}"{{- $tb.Example -}}"{{else}}{{$tb.Example}}{{end}},
         {{- end}}
     },
     {{- end}}
