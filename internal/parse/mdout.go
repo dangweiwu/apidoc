@@ -20,9 +20,17 @@ type MdOut struct {
 func NewMdOut(d *DocData, name string) *MdOut {
 	return &MdOut{d, name}
 }
+func add1(s int) int {
+	return s + 1
+}
+
+var funcMap = template.FuncMap{
+	"add1": add1,
+}
 
 func (this *MdOut) Out() error {
-	tpl, err := template.New("doc").Parse(md_tpl)
+
+	tpl, err := template.New("doc").Funcs(funcMap).Parse(md_tpl)
 	if err != nil {
 		return err
 	}

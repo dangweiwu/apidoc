@@ -14,13 +14,13 @@ window.SetConfig(
 - {{.Description}}
 
 {{- range $index,$group := .ApiGroup}}
-# {{$index+1}} {{$group.Title}}
+# {{$index | add1}} {{$group.Title}}
 
 {{$group.Desc}}
 
 {{- range $k,$api := $group.ApiInfo}}
 
-## {$index+1}}.{{$k+1}} {{$api.Title}}
+## {{$index | add1}}.{{$k | add1}} {{$api.Title}}
 
 {{- if $api.Desc}}
 
