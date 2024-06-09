@@ -21,6 +21,7 @@ const (
 	TAG             = "@"
 	SEP             = "|"
 	TAG_BASE        = "base"
+	TAG_VERSION     = "version"
 	TAG_DESC        = "desc"
 	TAG_GROUP       = "group"
 	TAG_API         = "api"
@@ -623,16 +624,22 @@ func (this *ParserCode) baseHanler(coms []*ast.Comment) {
 				switch k {
 				case 1:
 					this.Doc.Title = v
-				case 2:
+				}
+			}
+		case TAG_VERSION:
+			for k, v := range docList {
+				fmt.Printf("[info]: version %s \n", v)
+				switch k {
+				case 1:
 					this.Doc.Version = v
 				}
 			}
 		case TAG_DESC:
 			for k, v := range docList {
-				fmt.Printf("[info]: base %s \n", v)
+				fmt.Printf("[info]: desc %s \n", v)
 				switch k {
 				case 1:
-					this.Doc.Description = v
+					this.Doc.Description = append(this.Doc.Description, v)
 				}
 			}
 		}

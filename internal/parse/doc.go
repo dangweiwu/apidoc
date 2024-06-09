@@ -4,7 +4,7 @@ package parse
 type DocData struct {
 	Title       string      //标题
 	Version     string      //版本
-	Description string      //描述
+	Description []string    //描述
 	ApiGroup    []*ApiGroup //分组
 }
 

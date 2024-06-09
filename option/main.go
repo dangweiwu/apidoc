@@ -5,7 +5,6 @@ import (
 	"github.com/dangweiwu/apidoc/internal/filex"
 	"github.com/dangweiwu/apidoc/internal/parse"
 	"os"
-	"path/filepath"
 )
 
 var Opt Option
@@ -40,18 +39,17 @@ func (this *Root) Execute(args []string) error {
 
 	fobj := filex.NewFilex(root)
 	//fobj := &filex.Filex{Root: root}
-	err = fobj.GetModule()
-	if err != nil {
-		fmt.Printf("[ERR]: %s\n", err)
-		return nil
-	}
+	//err = fobj.GetModule()
+	//if err != nil {
+	//	fmt.Printf("[ERR]: %s\n", err)
+	//	return nil
+	//}
 
-	fmt.Printf("[MODULE]: %s\n", fobj.Module)
+	//fmt.Printf("[MODULE]: %s\n", fobj.Module)
 
 	fobj.Walk()
 	if len(this.Name) == 0 {
-		os.MkdirAll(filepath.Join(this.Root, "doc"), 0777)
-		this.Name = filepath.Join(this.Root, "doc", "api.md")
+		this.Name = "apidoc.md"
 	}
 
 	if err := parse.NewMdOut(fobj.Parse.Doc, this.Name).Out(); err == nil {

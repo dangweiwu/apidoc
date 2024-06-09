@@ -11,7 +11,9 @@ window.SetConfig(
 
 - 版本{{.Version}}
 
-- {{.Description}}
+{{- range $index,$des := .Description}}
+{{$des}}
+{{- end}}
 
 {{- range $index,$group := .ApiGroup}}
 # {{$index | add1}} {{$group.Title}}

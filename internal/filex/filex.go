@@ -82,7 +82,14 @@ func (this *Filex) visitFunc(fp string, fi os.FileInfo, err error) error {
 }
 
 func (this *Filex) Walk() {
-	filepath.Walk(this.Root, this.visitStruct)
-	filepath.Walk(this.Root, this.visitFunc)
+	roots := strings.Split(this.Root, ",")
+	for _, v := range roots {
+		filepath.Walk(v, this.visitStruct)
+	}
+
+	for _, v := range roots {
+		filepath.Walk(v, this.visitFunc)
+	}
+
 	this.Parse.SortData()
 }

@@ -5,6 +5,10 @@ package example
 func RouterApi() {}
 
 // Main
-// @base| xx系统管理 | v0.0.1
-// @desc| 系统管理 2024年 12月 1日
+// @base | xx系统管理
+// @version | v0.0.1
+// @desc|
+// @desc| - 系统管理 2024年 12月 1日
+// @desc| - 系统管理 2024年 12月 1日
+// @desc| - 系统管理 2024年 12月 1日
 func Main() {}
