@@ -151,7 +151,7 @@ func (this *ParserCode) ParseStructDoc(filePath string) error {
 		return fmt.Errorf("ast对象创建失败:%w", err)
 	}
 
-	//ast.Print(fset, f) /
+	//ast.Print(fset, f)
 
 	comNodes := ast.NewCommentMap(fset, f, f.Comments)
 	for node := range comNodes {
@@ -227,8 +227,9 @@ func (this *ParserCode) ParseStructDoc(filePath string) error {
 							case *ast.ArrayType:
 								//数组
 								if ident, ok := t.Elt.(*ast.Ident); ok {
-									param.Type = "[]" + ident.Obj.Name
-									param.Comment = "参考" + ident.Obj.Name + "定义"
+									//fmt.Println("=== in 数组", ident, ident.Obj, ident.String())
+									param.Type = "[]" + ident.String()
+									param.Comment = "参考" + ident.String() + "定义"
 								} else {
 									param.Type = "[]"
 								}
